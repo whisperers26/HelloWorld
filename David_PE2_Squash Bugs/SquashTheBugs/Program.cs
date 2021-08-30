@@ -26,14 +26,14 @@ namespace SquashTheBugs
             for (i = 1; i <= 10; ++i)
             {
                 // declare string to hold all numbers
-                // string allNumbers = null; 
+                // string allNumbers = null; compile time error
 
                 // output explanation of calculation
                 //Console.Write(i + "/" + i - 1 + " = "); (syntax error)
                 Console.Write($"{i} / ({i} - 1) = ");
 
                 // output the calculation based on the numbers
-                //Console.WriteLine(i / (i - 1)); logical error
+                //Console.WriteLine(i / (i - 1)); run time error
                 try
                 {
                     Console.WriteLine("{0:N}",(double)i/(i-1));
