@@ -41,8 +41,14 @@ namespace Mandelbrot
                 while (!bisRead)
                 {
                     Console.Write($"    Please input the {inputInf[0,i%2]} value for {inputInf[1, i / 2]} (default is {edgeVals[i]}): ");
+                    double tmp = edgeVals[i];
                     bisRead = double.TryParse(Console.ReadLine(), out edgeVals[i]);
-                    if (!bisRead) Console.WriteLine("   Your input is invalid!");
+                    //if read fail, ask user reinput
+                    if (!bisRead)
+                    {
+                        Console.WriteLine("   Your input is invalid!");
+                        edgeVals[i] = tmp;
+                    }
                 }
                 bisRead = false;
             }
