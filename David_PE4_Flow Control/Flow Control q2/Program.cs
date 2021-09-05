@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 namespace Flow_Control_q2
 {
+    /// <summary>
+	/// the execution class
+	/// </summary>
     class Program
     {
+        /// <summary>
+        /// this program lets user input two integers and judge whether both integers are <= 10. if yes, than valid
+        /// </summary>
         static void Main(string[] args)
         {
             Console.WriteLine("Please input two integer numbers:");
