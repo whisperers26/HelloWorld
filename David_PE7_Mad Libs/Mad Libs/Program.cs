@@ -75,10 +75,10 @@ namespace Mad_Libs
 
                 //split the string and let user prompt
                 string[] strArr = line.Split(' ');
-                string[] promptArr = new string[20];
-                int[] promptIndex = new int[200];
-                for (int i = 0; i < 200; i++) promptIndex[i] = -1;
-                string[] tmpArr = new string[20];
+                string[] promptArr = new string[100];
+                int[] promptIndex = new int[100];
+                for (int i = 0; i < 100; i++) promptIndex[i] = -1;
+                string[] tmpArr = new string[100];
 
                 for(int i = 0, j = 0; i < strArr.Length; i++)
                 {
@@ -93,7 +93,7 @@ namespace Mad_Libs
                     }
                 }
 
-                promptArr = promptArr.Distinct().ToArray();
+                //promptArr = promptArr.Distinct().ToArray();
                 for (int i = 0; i < promptArr.Length; i++)
                 {
                     if (promptArr[i] == null) break;
