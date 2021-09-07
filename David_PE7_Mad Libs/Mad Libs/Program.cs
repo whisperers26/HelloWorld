@@ -98,7 +98,7 @@ namespace Mad_Libs
                 {
                     if (promptArr[i] == null) break;
                     Console.Write("What word do you want to replace {0}: ", promptArr[i].Trim(',', '.', '?', '!'));
-                    tmpArr[i] = Console.ReadLine();
+                    tmpArr[i] = promptArr[i].Replace(promptArr[i].Trim(',', '.', '?', '!'), Console.ReadLine());
                 }
 
                 //replace all the words
