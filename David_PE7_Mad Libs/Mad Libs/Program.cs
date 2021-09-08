@@ -20,7 +20,8 @@ namespace Mad_Libs
         static void Main(string[] args)
         {
             //ask if user want to play
-            bool bvalidPlay = false, bwantPlay = false;
+            bool bvalidPlay = false;
+            bool bwantPlay = false;
             while (!bvalidPlay)
             {
                 Console.Write("Do you want to play Mad Lib? (yes/no) ");
@@ -105,7 +106,7 @@ namespace Mad_Libs
                 for(int i = 0; i < promptIndex.Length; i++)
                 {
                     if (promptIndex[i] < 0) break;
-                    strArr[promptIndex[i]] = tmpArr[Array.IndexOf(promptArr, strArr[promptIndex[i]])];
+                    strArr[promptIndex[i]] = tmpArr[i];
                 }
 
                 //add arrastr to the final result
