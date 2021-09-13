@@ -21,7 +21,7 @@ namespace PE8_q8
             Console.WriteLine("Please input a string: ");
             string input = Console.ReadLine();
             string output = "";
-            output = ReplaceCaseInsensitive(input, "no", "yes");
+            output = ReplaceCaseInsensitive(input, @"no\b", "yes");
             Console.WriteLine(output);
         }
 
@@ -38,12 +38,12 @@ namespace PE8_q8
                 if (!c.Success) break;
                 if (!Regex.IsMatch(c.Value, "[A-Z]"))
                 {
-                    newStr = newStr.Remove(c.Index, oldPattern.Length);
+                    newStr = newStr.Remove(c.Index, c.Length);
                     newStr = newStr.Insert(c.Index, newPattern);
                 }
                 else
                 {
-                    newStr = newStr.Remove(c.Index, oldPattern.Length);
+                    newStr = newStr.Remove(c.Index, c.Length);
                     newStr = newStr.Insert(c.Index, newPattern.Replace(newPattern[0], Char.ToUpper(newPattern[0])));
                 }
             }
