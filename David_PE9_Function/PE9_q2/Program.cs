@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Threading;
+using System.IO;
 
 namespace PE9_q2
 {
@@ -195,7 +196,8 @@ namespace PE9_q2
                 do
                 {
                     Console.Write(sQuestions);
-                    sResponse = Reader.ReadLine(timeForEach*1000);
+                    Reader rdr = new Reader();
+                    sResponse = rdr.ReadLine(timeForEach*1000);
                     try
                     {
                         nResponse = int.Parse(sResponse);
@@ -263,6 +265,7 @@ namespace PE9_q2
     class Reader
     {
         private static Thread readLineThread;
+        private static AutoResetEvent inputBegin;
         private static AutoResetEvent inputDone;
         private static string inputStr;
 
@@ -270,6 +273,7 @@ namespace PE9_q2
         static Reader()
         {
             inputDone = new AutoResetEvent(false);
+            inputBegin = new AutoResetEvent(false);
             readLineThread = new Thread(readLine);
             readLineThread.IsBackground = true;
             readLineThread.Start();
@@ -277,12 +281,14 @@ namespace PE9_q2
 
         private static void readLine()
         {
+            inputBegin.WaitOne();
             inputStr = Console.ReadLine();
             inputDone.Set();
         }
        
-        public static string ReadLine(int timeInterval = Timeout.Infinite)
+        public string ReadLine(int timeInterval = Timeout.Infinite)
         {
+            inputBegin.Set();
             readLineThread.Abort();
             readLineThread = new Thread(readLine);
             readLineThread.IsBackground = true;
@@ -294,6 +300,11 @@ namespace PE9_q2
             }
             else
             {
+                StringReader strReader = new StringReader(Convert.ToString(Int32.MaxValue));
+                Console.SetIn(strReader);
+                Console.ReadLine();
+                var standardInput = new StreamReader(Console.OpenStandardInput());
+                Console.SetIn(standardInput);
                 return Convert.ToString(Int32.MaxValue);
             }
         }
