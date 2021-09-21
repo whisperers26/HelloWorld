@@ -265,7 +265,6 @@ namespace PE9_q2
     class Reader
     {
         private static Thread readLineThread;
-        private static AutoResetEvent inputBegin;
         private static AutoResetEvent inputDone;
         private static string inputStr;
 
@@ -273,7 +272,6 @@ namespace PE9_q2
         static Reader()
         {
             inputDone = new AutoResetEvent(false);
-            inputBegin = new AutoResetEvent(false);
             readLineThread = new Thread(readLine);
             readLineThread.IsBackground = true;
             readLineThread.Start();
@@ -281,14 +279,12 @@ namespace PE9_q2
 
         private static void readLine()
         {
-            inputBegin.WaitOne();
             inputStr = Console.ReadLine();
             inputDone.Set();
         }
        
         public string ReadLine(int timeInterval = Timeout.Infinite)
         {
-            inputBegin.Set();
             readLineThread.Abort();
             readLineThread = new Thread(readLine);
             readLineThread.IsBackground = true;
