@@ -195,9 +195,8 @@ namespace PE9_q2
                 // display the question and prompt for the answer
                 do
                 {
-                    Console.Write(sQuestions);
-                    Reader rdr = new Reader();
-                    sResponse = rdr.ReadLine(timeForEach*1000);
+                    Console.Write(sQuestions);                  
+                    sResponse = Reader.ReadLine(timeForEach*1000);
                     try
                     {
                         nResponse = int.Parse(sResponse);
@@ -242,6 +241,7 @@ namespace PE9_q2
 
             do
             {
+                
                 // prompt if they want to play again
                 Console.Write("Do you want to play again? ");
 
@@ -265,6 +265,7 @@ namespace PE9_q2
     class Reader
     {
         private static Thread readLineThread;
+        private static AutoResetEvent inputBegin;
         private static AutoResetEvent inputDone;
         private static string inputStr;
 
@@ -272,6 +273,7 @@ namespace PE9_q2
         static Reader()
         {
             inputDone = new AutoResetEvent(false);
+            inputBegin = new AutoResetEvent(false);
             readLineThread = new Thread(readLine);
             readLineThread.IsBackground = true;
             readLineThread.Start();
@@ -279,17 +281,22 @@ namespace PE9_q2
 
         private static void readLine()
         {
+            inputBegin.WaitOne();
             inputStr = Console.ReadLine();
             inputDone.Set();
         }
        
-        public string ReadLine(int timeInterval = Timeout.Infinite)
+        public static string ReadLine(int timeInterval = Timeout.Infinite)
         {
+            inputDone = new AutoResetEvent(false);
+            inputBegin = new AutoResetEvent(false);
             readLineThread.Abort();
             readLineThread = new Thread(readLine);
             readLineThread.IsBackground = true;
             readLineThread.Start();
+            inputBegin.Set();
             bool isInput = inputDone.WaitOne(timeInterval);
+            readLineThread.Abort();
             if (isInput)
             {
                 return inputStr;
@@ -298,10 +305,10 @@ namespace PE9_q2
             {
                 StringReader strReader = new StringReader(Convert.ToString(Int32.MaxValue));
                 Console.SetIn(strReader);
-                Console.ReadLine();
+                string tmp = Console.ReadLine();
                 var standardInput = new StreamReader(Console.OpenStandardInput());
                 Console.SetIn(standardInput);
-                return Convert.ToString(Int32.MaxValue);
+                return tmp;
             }
         }
     }
