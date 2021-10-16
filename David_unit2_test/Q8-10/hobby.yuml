@@ -1,0 +1,14 @@
+// {type:class}
+// {generate:true}
+// {direction:topDown}
+
+[+A:Calligraphy|-content:string|+Content:string;+Write():v]
+[+I:IGrind|PrepareInk()]
+[+I:ISharpen|SharpenPencil()]
+[+SoftPenCalligraphy||+PrepareInk();+Write():o]
+[+HardPenCalligraphy||+SharpenPencil();+Write():o]
+
+[+A:Calligraphy]<-.-[+SoftPenCalligraphy]
+[+I:IGrind]^[+SoftPenCalligraphy]
+[+A:Calligraphy]<-.-[+HardPenCalligraphy]
+[+I:ISharpen]^[+HardPenCalligraphy]
