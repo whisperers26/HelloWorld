@@ -28,7 +28,7 @@ namespace Graph
                 //A B C D E F G H
                 /*A*/{(0,0), (2,1), (-1,-1), (-1,-1), (-1,-1), (-1,-1), (-1,-1), (-1,-1) },
                 /*B*/{(-1,-1), (-1,-1), (2, 1), (3, 0), (-1,-1),(-1,-1),(-1,-1),(-1,-1) },
-                /*C*/{(-1,-1), (2,3), (-1,-1), (-1,-1), (-1,-1), (-1,-1), (-1,-1), (-1,-1) },
+                /*C*/{(-1,-1), (2,3), (-1,-1), (-1,-1), (-1,-1), (-1,-1), (-1,-1), (20,1) },
                 /*D*/{(-1,-1), (3,2), (5,1), (-1,-1), (2,3), (4,0), (-1,-1), (-1,-1)  },
                 /*E*/{(-1,-1), (-1,-1), (-1,-1), (-1,-1), (-1,-1), (3,1), (-1,-1), (-1,-1) },
                 /*F*/{(-1,-1), (-1,-1), (-1,-1), (-1,-1), (-1,-1), (-1,-1), (1,0), (-1,-1) },
@@ -41,7 +41,7 @@ namespace Graph
         {
                 /*A*/new (int,int,int)[] {(0,0,0),(1,2,1) },
                 /*B*/new (int,int,int)[] {(2,2,1),(3,3,0) },
-                /*C*/new (int,int,int)[] {(1,2,3) },
+                /*C*/new (int,int,int)[] {(1,2,3),(7,20,1) },
                 /*D*/new (int,int,int)[] {(1,3,2),(2,5,1),(4,2,3),(5,4,0) },
                 /*E*/new (int,int,int)[] {(5,3,1) },
                 /*F*/new (int,int,int)[] {(6,1,0) },
@@ -58,71 +58,135 @@ namespace Graph
         //represent graph in both ways
         static void Main(string[] args)
         {
-            
-
-
-
-            
-
-            //begin the game
-            Console.WriteLine("Welcome to the game!");
-            
-            player = new Player(1, lGraph, 0);
-
-            //for each turn
-            while (!bWin && player.GetHP() > 0)
+            bool bWantPlay = true;
+            do
             {
-                Console.WriteLine("----------------------------------");
-                //first show ui message
-                ShowUI();
+                //begin the game
+                Console.WriteLine("Welcome to the game!");
 
-                //then ask whether the player wants to leave via exit or wager their hp
-                bValid = false;
-                while (!bValid)
+                player = new Player(1, lGraph, 0);
+
+                //for each turn
+                while (!bWin && player.GetHP() > 0)
                 {
-                    Console.WriteLine("Make a choice: leave or wager?");
-                    Console.WriteLine("     Please enter l for leave, w for wager");
-                    string answer = Console.ReadLine();
-                    if(answer == "l")
+                    Console.WriteLine("----------------------------------");
+                    //first show ui message
+                    ShowUI();
+
+                    //then ask whether the player wants to leave via exit or wager their hp
+                    bValid = false;
+                    while (!bValid)
                     {
-                        break;
-                    }
-                    else if (answer == "w")
-                    {
-                        int wagerNum;
-                        do
+                        Console.WriteLine("Make a choice: leave or wager?");
+                        Console.WriteLine("     Please enter l for leave, w for wager");
+                        string answer = Console.ReadLine();
+                        //move to another room
+                        if (answer == "l")
                         {
-                            Console.WriteLine("How much HP do you want to wager?");
+                            //ask the player which direction he wants to go
+                            int nextDirection = -1;
+                            bool bDirectionValid = false;
+
+                            (int Room, int Cost, int Direction)[] availableRooms = FindAvailableRooms();
+                            do
+                            {
+                                Console.WriteLine("Which direction do you want to go? Enter east/south/west/north.");
+                                for (int i = 0; i < availableRooms.Length; i++)
+                                {
+                                    if (availableRooms[i] != (-1, -1, -1))
+                                    {
+                                        Console.WriteLine("     Available direction: {0}.", directions[availableRooms[i].Direction]);
+                                    }
+                                }
+                                nextDirection = Array.IndexOf(directions, Console.ReadLine());
+                                for (int i = 0; i < availableRooms.Length; i++)
+                                {
+                                    if (availableRooms[i] != (-1, -1, -1))
+                                    {
+                                        if (nextDirection == availableRooms[i].Direction) bDirectionValid = true;
+                                    }
+                                }
+                            }
+                            while (nextDirection < 0 || !bDirectionValid);
+
+                            //move according to the direction
+                            MoveToRoom(nextDirection, ref availableRooms);
+                            break;
                         }
-                        while (!int.TryParse(Console.ReadLine(), out wagerNum)||wagerNum<0||wagerNum>player.GetHP());
- 
-                        bool bCorrect = RaiseQuestion();
-                        if (bCorrect)
+
+                        //wager some of the hp to answer the question
+                        else if (answer == "w")
                         {
-                            player.IncreaseHP(wagerNum);
-                            Console.WriteLine("Your answer is correct! Your hp has increased.");
+                            int wagerNum;
+                            do
+                            {
+                                Console.WriteLine("How much HP do you want to wager?");
+                            }
+                            while (!int.TryParse(Console.ReadLine(), out wagerNum) || wagerNum < 0/*||wagerNum>player.GetHP()*/);
+
+                            bool bCorrect = RaiseQuestion();
+                            if (bCorrect)
+                            {
+                                player.IncreaseHP(wagerNum);
+                                Console.WriteLine("Your answer is correct! Your hp has increased.");
+                            }
+                            else
+                            {
+                                player.DecreaseHP(wagerNum);
+                                Console.WriteLine("Your answer is wrong! Your hp has decreased.");
+                            }
+                            break;
                         }
                         else
                         {
-                            player.DecreaseHP(wagerNum);
-                            Console.WriteLine("Your answer is wrong! Your hp has decreased.");
+                            Console.WriteLine("Your input is invalid!");
+                            Console.WriteLine("----------------------");
                         }
-                        break;
                     }
-                    else
+
+                    //check if reach the final point
+                    if (player.CurrentLocation == rooms.Length - 1)
                     {
-                        Console.WriteLine("Your input is invalid!");
-                        Console.WriteLine("----------------------");
+                        bWin = true;
                     }
                 }
 
-            }
+                //the game ends
+                if (player.GetHP() <= 0)
+                {
+                    Console.WriteLine("You lose all the hp. Bad luck.");
+                }
+                else if (bWin)
+                {
+                    Console.WriteLine("----------------------------------");
+                    Console.WriteLine("Congratulations! You reach the destination!");
+                }
+                else
+                {
+                    Console.WriteLine("Bug in winning condition. check it");
+                }
 
-            //the game ends
-            if (player.GetHP() <= 0)
-            {
-                Console.WriteLine("You lose all the hp. Bad luck.");
+                //ask if want to play again
+                bool bPlayValid = false;
+                while (!bPlayValid)
+                {
+                    Console.WriteLine("\n----------------------------------");
+                    Console.WriteLine("Do you want to play again? y/n");
+                    string answer = Console.ReadLine();
+                    if (answer == "y")
+                    {
+                        bPlayValid = true;
+                        bWantPlay = true;
+                    } 
+                    else if (answer == "n")
+                    {
+                        bPlayValid = true;
+                        bWantPlay = false;
+                    }
+                }
             }
+            while (bWantPlay);
+
         }
 
         //show ui including hp and all the rooms the player can go
@@ -142,6 +206,7 @@ namespace Graph
             Console.WriteLine("------------------------------------");
         }
 
+        //return available rooms
         public static (int, int, int)[] FindAvailableRooms()
         {
             (int Room, int Cost, int Direction)[] adjacentList = ((int, int, int)[])lGraph[player.CurrentLocation].Clone();
@@ -150,6 +215,22 @@ namespace Graph
                 if (player.GetHP() - adjacentList[i].Cost <= 0) adjacentList[i] = (-1,-1,-1);
             }
             return adjacentList;
+        }
+
+        //move to corresponding room
+        public static void MoveToRoom(int direction, ref (int Room, int Cost, int Direction)[] availableRooms)
+        {
+            for(int i = 0; i < availableRooms.Length; i++)
+            {
+                if (direction == availableRooms[i].Direction)
+                {
+                    player.CurrentLocation = availableRooms[i].Room;
+                    player.DecreaseHP(availableRooms[i].Cost);
+                    return;
+                }
+            }
+            Console.WriteLine("Bug: cannot move to room");
+            return;
         }
 
         //ask and answer a question
