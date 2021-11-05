@@ -122,7 +122,7 @@ namespace Graph
                             {
                                 Console.WriteLine("How much HP do you want to wager?");
                             }
-                            while (!int.TryParse(Console.ReadLine(), out wagerNum) || wagerNum < 0/*||wagerNum>player.GetHP()*/);
+                            while (!int.TryParse(Console.ReadLine(), out wagerNum) || wagerNum < 0||wagerNum>player.GetHP());
 
                             bool bCorrect = RaiseQuestion();
                             if (bCorrect)
