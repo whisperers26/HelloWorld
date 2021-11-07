@@ -39,7 +39,7 @@ namespace Graph
         //list
         private static readonly (int Room, int Cost, int Direction)[][] lGraph = new (int, int, int)[][]
         {
-                /*A*/new (int,int,int)[] {(0,0,0),(1,2,1) },
+                /*A*/new (int,int,int)[] {(0,0,3),(0,0,0),(1,2,1) },
                 /*B*/new (int,int,int)[] {(2,2,1),(3,3,0) },
                 /*C*/new (int,int,int)[] {(1,2,3),(7,20,1) },
                 /*D*/new (int,int,int)[] {(1,3,2),(2,5,1),(4,2,3),(5,4,0) },
@@ -50,10 +50,11 @@ namespace Graph
         };
 
         //pair of abcdefgh to 0-7
-        private static string[] rooms = { "A", "B", "C", "D", "E", "F", "G", "H" };
+        private static string[] rooms = { "Hestia", "Hermes", "Aphrodite", "Demeter", "Ares", "Athena", "Poseidon", "Zeus" };
         //pair of east, south, west, north to 0-3
         private static string[] directions = { "east", "south", "west", "north" };
 
+        private static Random random = new Random();
 
         //represent graph in both ways
         static void Main(string[] args)
@@ -86,18 +87,29 @@ namespace Graph
                             //ask the player which direction he wants to go
                             int nextDirection = -1;
                             bool bDirectionValid = false;
+                            bool bDirectionExist = false;
 
                             (int Room, int Cost, int Direction)[] availableRooms = FindAvailableRooms();
                             do
                             {
                                 Console.WriteLine("Which direction do you want to go? Enter east/south/west/north.");
+                                
                                 for (int i = 0; i < availableRooms.Length; i++)
                                 {
                                     if (availableRooms[i] != (-1, -1, -1))
                                     {
                                         Console.WriteLine("     Available direction: {0}.", directions[availableRooms[i].Direction]);
+                                        bDirectionExist = true;
                                     }
                                 }
+                                //if no available rooms, exit
+                                if (!bDirectionExist)
+                                {
+                                    Console.WriteLine("Sorry, no available directions.");
+                                    break;
+                                }
+
+                                //if has direction, continue
                                 nextDirection = Array.IndexOf(directions, Console.ReadLine());
                                 for (int i = 0; i < availableRooms.Length; i++)
                                 {
@@ -110,6 +122,7 @@ namespace Graph
                             while (nextDirection < 0 || !bDirectionValid);
 
                             //move according to the direction
+                            if (!bDirectionExist) break;
                             MoveToRoom(nextDirection, ref availableRooms);
                             break;
                         }
@@ -193,6 +206,7 @@ namespace Graph
         public static void ShowUI()
         {
             Console.WriteLine("HP: {0}", player.GetHP());
+            Console.WriteLine("You are in room: {0}", rooms[player.CurrentLocation]);
             Console.WriteLine("");
 
             (int Room, int Cost, int Direction)[] availableRooms = FindAvailableRooms();
@@ -226,6 +240,12 @@ namespace Graph
                 {
                     player.CurrentLocation = availableRooms[i].Room;
                     player.DecreaseHP(availableRooms[i].Cost);
+
+                    //reduce random cost
+                    int randHP = random.Next(0, player.GetHP());
+                    Console.WriteLine("An accident happens and you lost {0} hp", randHP);
+                    player.DecreaseHP(randHP);
+
                     return;
                 }
             }
