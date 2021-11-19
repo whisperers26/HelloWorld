@@ -9,7 +9,8 @@ namespace q2_5_DirectedGraph
     class Program
     {
         //Red:0, Blue:1, Grey:2, Light Blue:3, Yellow:4, Pruple:5, Orange:6, Green:7
-        
+        public static string[] colors = { "|red|", "|dark blue|", "|grey|", "|light blue|", "|yellow|", "|purple|", "|orange|", "|green|" };
+
         //adjacent matrix of the graph
         private static int[,] mGraph = new int[,]
         {
@@ -41,7 +42,7 @@ namespace q2_5_DirectedGraph
         //main method
         static void Main(string[] args)
         {
-            Console.WriteLine("DFS of vertex 0: ");
+            Console.WriteLine("DFS of vertex |red|: ");
             DFS(0);
 
             //use the  linked list version
@@ -61,7 +62,7 @@ namespace q2_5_DirectedGraph
             graph.PrintGraph();
             //Console.WriteLine("distance from 4 to 7: {0}", graph.CalculateCost(4,7));
             int[] distances = graph.dijkstra(0);
-            for (int i = 0; i < distances.Length; i++) Console.WriteLine("Distance from 0 to {0}: {1}", i, distances[i]);
+            for (int i = 0; i < distances.Length; i++) Console.WriteLine("Distance from |red| to {0}: {1}", colors[i], distances[i]);
         }
 
         //DFS 
@@ -77,7 +78,7 @@ namespace q2_5_DirectedGraph
         {
             //set vertex to visited and record
             visited[v] = true;
-            Console.Write("{0} ", v);
+            Console.Write("{0} ", colors[v]);
 
             //recur all
             (int vertex, int edge)[] vList = lGraph[v];
@@ -159,10 +160,10 @@ namespace q2_5_DirectedGraph
         {
             foreach(var linkedList in graph)
             {
-                Console.Write("{0}: ", graph.IndexOf(linkedList));
+                Console.Write("{0}: ", Program.colors[graph.IndexOf(linkedList)]);
                 foreach((int destination, int edge) item in linkedList)
                 {
-                    Console.Write("({0}, {1})", item.destination, item.edge);
+                    Console.Write("({0}, {1})", Program.colors[item.destination], item.edge);
                 }
                 Console.WriteLine();
             }
