@@ -26,6 +26,9 @@ namespace Graph
 
         private static Player player;
 
+        private static readonly object graphLock = new object();
+        private static readonly object bValidLock = new object();
+
         //matrix
         private static (int Cost, int Direction)[,] mGraph = new (int, int)[,]
         {
@@ -378,8 +381,11 @@ namespace Graph
             //Console.WriteLine(source.GetType());
             if (source.GetType() == typeof(System.Timers.Timer))
             {
-                Console.WriteLine("Press Enter to continue!");
-                bValid = true;
+                lock (bValidLock)
+                {
+                    Console.WriteLine("Press Enter to continue!");
+                    bValid = true;
+                } 
             }
         }
 
@@ -417,6 +423,7 @@ namespace Graph
         public static void ChangeRoomStates()
         {
             stateInterval = new System.Timers.Timer(1000);
+    
             stateInterval.Elapsed += StateInterval_Elapsed;
             stateInterval.AutoReset = true;
             stateInterval.Enabled = true;
@@ -424,19 +431,23 @@ namespace Graph
 
         private static void StateInterval_Elapsed(object sender, ElapsedEventArgs e)
         {
-            for (int j = 0; j < lGraph.Length; j++)
+            lock (graphLock)
             {
-                (int Room, int Cost, int State)[] aList = lGraph[j];
-                //Console.WriteLine("j: " + j);
-                for (int i = 0; i < aList.Length; i++)
+                for (int j = 0; j < lGraph.Length; j++)
                 {
-                    lGraph[j][i].State++;
-                    if (aList[i].State >= states.Length) lGraph[j][i].State = 0;
-                    //Console.Write(rooms[lGraph[j][i].Room]+" "+ states[lGraph[j][i].State]);
+                    (int Room, int Cost, int State)[] aList = lGraph[j];
+                    //Console.WriteLine("j: " + j);
+                    for (int i = 0; i < aList.Length; i++)
+                    {
+                        lGraph[j][i].State++;
+                        if (aList[i].State >= states.Length) lGraph[j][i].State = 0;
+                        //Console.Write(rooms[lGraph[j][i].Room]+" "+ states[lGraph[j][i].State]);
+                    }
+                    //Console.WriteLine();
                 }
-                //Console.WriteLine();
+                //Console.WriteLine("-----------------");
             }
-            //Console.WriteLine("-----------------");
+
 
         }
     }
